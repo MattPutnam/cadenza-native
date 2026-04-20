@@ -1,0 +1,28 @@
+{
+  "name": "cadenza",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "android:phone": "$ANDROID_HOME/emulator/emulator -avd Pixel_7 & $ANDROID_HOME/platform-tools/adb wait-for-device && expo start --android",
+    "android:tablet": "$ANDROID_HOME/emulator/emulator -avd Pixel_Tablet & $ANDROID_HOME/platform-tools/adb wait-for-device && expo start --android",
+    "ios": "expo start --ios",
+    "ios:iphone": "expo start --ios --device \"iPhone 15\"",
+    "ios:ipad": "expo start --ios --device \"iPad Pro 11-inch (M4)\"",
+    "web": "expo start --web"
+  },
+  "dependencies": {
+    "expo": "~54.0.33",
+    "expo-status-bar": "~3.0.9",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "react-native": "0.81.5",
+    "react-native-web": "^0.21.0"
+  },
+  "devDependencies": {
+    "@types/react": "~19.1.0",
+    "typescript": "~5.9.2"
+  },
+  "private": true
+}

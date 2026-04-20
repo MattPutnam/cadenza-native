@@ -1,0 +1,118 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+
+# Node
+node_modules/
+npm-debug.*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.npm
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# Expo
+.expo/
+.expo-shared/
+dist/
+web-build/
+expo-env.d.ts
+
+# Metro
+.metro-health-check*
+.haste_cache/
+
+# React Native
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+
+# iOS
+ios/Pods/
+ios/build/
+ios/DerivedData/
+ios/*.xcworkspace/xcuserdata/
+ios/*.xcodeproj/xcuserdata/
+ios/*.xcodeproj/project.xcworkspace/xcuserdata/
+*.hmap
+*.ipa
+*.xcuserstate
+
+# Android
+android/app/build/
+android/build/
+android/.gradle/
+android/local.properties
+android/captures/
+android/app/release/
+android/app/debug/
+*.apk
+*.aab
+*.keystore
+!debug.keystore
+
+# Build outputs
+build/
+coverage/
+*.log
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+*.pem
+
+# Editors / IDEs
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+*.swp
+*.swo
+
+# TypeScript
+*.tsbuildinfo
+
+# Testing
+.jest/
+
+# AI agents
+# Claude Code — personal/machine-local state (shared config in .claude/ is committed)
+CLAUDE.local.md
+.claude/settings.local.json
+.claude/.credentials.json
+.claude/projects/
+.claude/shell-snapshots/
+.claude/todos/
+.claude/statsig/
+
+# Cursor — keep .cursor/rules/ committed; ignore other user state under .cursor/
+.cursor/*
+!.cursor/rules/
+
+# GitHub Copilot — keep .github/copilot-instructions.md committed
+.github/copilot-instructions.local.md
+
+# Aider — keep .aider.conf.yml and .aiderignore committed; ignore history/caches
+.aider.chat.history*
+.aider.input.history*
+.aider.tags.cache.*/
+
+# Windsurf / Codeium — keep .windsurfrules committed; ignore caches
+.windsurf/
+.codeium/
+
+# Roo — session/cache state
+.roo/
