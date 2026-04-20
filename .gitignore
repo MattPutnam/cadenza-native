@@ -116,3 +116,6 @@ CLAUDE.local.md
 
 # Roo — session/cache state
 .roo/
+
+# Spec-Kit — active-feature pointer (branch name + specs/ dir are source of truth)
+.specify/feature.json
