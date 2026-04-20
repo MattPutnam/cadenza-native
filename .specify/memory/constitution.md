@@ -1,33 +1,31 @@
 <!--
 Sync Impact Report
 ==================
-Version change: (uninitialized template) → 1.0.0 (initial ratification)
-Bump rationale: First concrete ratification of the constitution. The previous
-file contained only placeholder tokens; all sections are being filled for the
-first time, so semantic versioning starts at 1.0.0.
+Version change: 1.0.0 → 1.1.0
+Bump rationale: MINOR — two new principles added (VI. Touch-First Performer UX,
+VII. Focused Accessibility) codifying the UX/UI rules in docs/design.md. No
+existing principles were removed or redefined, and no governance process
+changed. Added a brief "UX Design Reference" pointer under Platform &
+Technology Constraints so the design doc is discoverable from the constitution.
 
-Principles added (none removed):
-  - I. Reliability During Performance (NON-NEGOTIABLE)
-  - II. Real-Time MIDI Path Integrity
-  - III. Hardware-First Sound Architecture
-  - IV. Test-First for Stage-Affecting Logic
-  - V. Spec-Driven, Feature-Branch Development
+Principles added:
+  - VI. Touch-First Performer UX
+  - VII. Focused Accessibility
 
-Sections added:
-  - Platform & Technology Constraints
-  - Development Workflow & Quality Gates
-  - Governance
+Principles renamed / removed: none.
 
-Sections removed: none.
+Sections added: none at top level. Updated "Platform & Technology Constraints"
+with a pointer to docs/design.md and docs/glossary.md as the canonical
+references for UX and domain terminology.
 
 Templates and docs reviewed for alignment:
-  - .specify/templates/plan-template.md              ✅ compatible (Constitution Check gate retained; no edits needed)
-  - .specify/templates/spec-template.md              ✅ compatible (domain-agnostic; no edits needed)
-  - .specify/templates/tasks-template.md             ✅ compatible (tests marked optional per template; Principle IV
-                                                         narrows this for stage-affecting logic but does not require
-                                                         template changes)
-  - .specify/extensions.yml                          ✅ aligned (before_specify → speckit.git.feature enforces Principle V)
-  - README.md                                        ✅ no change required (product overview, not governance)
+  - .specify/templates/plan-template.md      ✅ compatible (Constitution Check placeholder remains open; no edits needed)
+  - .specify/templates/spec-template.md      ✅ compatible (domain-agnostic)
+  - .specify/templates/tasks-template.md     ✅ compatible (Principles VI/VII apply to UI tasks but do not require new task categories)
+  - .specify/extensions.yml                  ✅ unchanged (still enforces Principle V)
+  - README.md                                ✅ no change required (product overview)
+  - docs/design.md                           ✅ source material — cited from constitution, no change
+  - docs/glossary.md                         ✅ reference — cited from constitution, no change
 
 Deferred / TODO: none.
 -->
@@ -127,6 +125,53 @@ plan, tasks, and implementation on that same branch.
 almost-right. Forcing every feature through a written spec, on an isolated
 branch, keeps the domain reasoning visible and the history auditable.
 
+### VI. Touch-First Performer UX
+
+Cadenza's interface targets performing musicians operating a tablet (primary)
+or phone (secondary) on a music stand, typically in dim light, often with only
+moments free between passages. All UI design MUST assume a touch interface.
+
+- Hit targets MUST be sized for finger use (no stylus- or cursor-sized
+  controls), hover states are prohibited as a means of conveying information or
+  affordance, and no action that a performer may need during a show may require
+  a multi-touch gesture.
+- Tablet layouts are the reference design. Phone layouts MAY present the same
+  information more compactly (text lists in place of graphical keyboard or
+  channel maps, fewer simultaneous panels) and MAY omit advanced editor
+  surfaces, but MUST retain functional parity for anything reachable from
+  performance mode.
+- Dark mode is the only supported theme. No light-mode surfaces may ship, and
+  all colors MUST remain legible and non-glaring in orchestra-pit darkness.
+- Desktop builds, if produced, inherit the touch/tablet design unchanged; no
+  desktop-specific UI work is in scope and desktop-only affordances (right
+  click menus, hover tooltips) MUST NOT be introduced as the sole path to a
+  feature.
+
+**Rationale:** The target environment is a darkened orchestra pit with a tablet
+on a music stand. Design choices that optimize for pointer input, hover states,
+bright rooms, or light themes actively fail the user.
+
+### VII. Focused Accessibility
+
+Cadenza's users are sighted keyboardists with high manual dexterity operating
+in live performance. Accessibility requirements therefore target the assistive
+pathways those users actually use, not a generic checklist:
+
+- Screen-reader / VoiceOver / TalkBack support is NOT required. Semantic
+  labelling is encouraged where cheap, but features are not gated on it.
+- Physical keyboard operation MUST work wherever a performer or editor might
+  reasonably use one: focus cycles MUST be logical, every actionable control
+  reachable via performance-mode input MUST be reachable via keyboard, and
+  focus states MUST be clearly visible against the dark-mode background.
+- Color contrast MUST meet WCAG AA for performance-mode text and controls, and
+  no information MUST be conveyed by color alone — shape, label, or position
+  MUST also distinguish it — so color-deficient users retain full function.
+
+**Rationale:** Narrowing the accessibility scope to what the real user base
+depends on lets the team invest meaningfully in the pieces that matter
+(keyboard navigation, contrast, color-blind safety) rather than spreading thin
+across surfaces no one uses.
+
 ## Platform & Technology Constraints
 
 - **Runtime targets:** iOS and Android. Feature parity across both is the
@@ -144,17 +189,26 @@ branch, keeps the domain reasoning visible and the history auditable.
 - **Data persistence:** Show data (songs, cues, patches, triggers, remaps,
   imported PDFs) MUST be stored locally on-device and survive app restarts and
   OS upgrades without data loss.
+- **UX design reference:** `docs/design.md` is the canonical source for UI
+  design rules that extend Principles VI and VII (touch targets, tablet-vs-
+  phone layout, dark mode, accessibility scope). `docs/glossary.md` is the
+  canonical source for domain terminology (Keyboard, Synthesizer, Bank,
+  Channel, Patch, Cue, Trigger); specs, plans, and code MUST use these terms
+  consistently.
 
 ## Development Workflow & Quality Gates
 
 - **Specs:** Every feature begins with a spec created via `/speckit.specify` on
   a feature branch. Specs MUST describe user-visible behavior in terms a
-  musical-director or keyboardist would recognize, not in framework terms.
+  musical-director or keyboardist would recognize, not in framework terms, and
+  MUST use glossary terminology.
 - **Plans:** Every plan MUST include a Constitution Check that explicitly
-  evaluates the five principles above. Violations MUST either be resolved or
+  evaluates all seven principles above. Violations MUST either be resolved or
   documented in Complexity Tracking.
 - **Code review:** PRs MUST link their spec directory and MUST NOT merge if any
-  stage-affecting logic lacks the tests required by Principle IV.
+  stage-affecting logic lacks the tests required by Principle IV, or if any
+  user-facing surface violates Principles VI or VII without a documented
+  exception.
 - **Releases:** Any change to MIDI dispatch, trigger resolution, cue advance, or
   patch loading MUST be validated end-to-end against a physical MIDI device (or
   a recorded-fixture harness derived from one) before release.
@@ -178,7 +232,7 @@ this document, or by amending this document.
   compliance gate. Reviewers MUST reject PRs that violate a principle without an
   accepted Complexity Tracking entry.
 - **Runtime guidance:** Day-to-day implementation guidance that is not
-  constitutional in nature belongs in `README.md` or feature-specific docs
-  under `/specs/…/`, not in this file.
+  constitutional in nature belongs in `README.md`, `docs/`, or feature-specific
+  docs under `/specs/…/`, not in this file.
 
-**Version**: 1.0.0 | **Ratified**: 2026-04-19 | **Last Amended**: 2026-04-19
+**Version**: 1.1.0 | **Ratified**: 2026-04-19 | **Last Amended**: 2026-04-19
