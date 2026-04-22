@@ -1,5 +1,6 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { Shell } from '../../src/app/Shell';
+import { KeyboardsProvider } from '../../src/keyboards/KeyboardsContext';
 import { MidiInputProvider } from '../../src/midi/MidiInputContext';
 import { ModeProvider } from '../../src/mode/ModeContext';
 import { PreferencesProvider } from '../../src/prefs/PreferencesContext';
@@ -25,7 +26,9 @@ function renderShell() {
     <PreferencesProvider loader={() => Promise.resolve({})} saver={() => Promise.resolve()}>
       <MidiInputProvider>
         <ModeProvider>
-          <Shell />
+          <KeyboardsProvider loader={async () => null} saver={async () => undefined}>
+            <Shell />
+          </KeyboardsProvider>
         </ModeProvider>
       </MidiInputProvider>
     </PreferencesProvider>,
@@ -52,7 +55,9 @@ describe('FR-012: mid-session layout-mode change', () => {
       <PreferencesProvider loader={() => Promise.resolve({})} saver={() => Promise.resolve()}>
         <MidiInputProvider>
           <ModeProvider>
-            <Shell />
+            <KeyboardsProvider loader={async () => null} saver={async () => undefined}>
+              <Shell />
+            </KeyboardsProvider>
           </ModeProvider>
         </MidiInputProvider>
       </PreferencesProvider>,
@@ -70,7 +75,9 @@ describe('FR-012: mid-session layout-mode change', () => {
       <PreferencesProvider loader={() => Promise.resolve({})} saver={() => Promise.resolve()}>
         <MidiInputProvider>
           <ModeProvider>
-            <Shell />
+            <KeyboardsProvider loader={async () => null} saver={async () => undefined}>
+              <Shell />
+            </KeyboardsProvider>
           </ModeProvider>
         </MidiInputProvider>
       </PreferencesProvider>,

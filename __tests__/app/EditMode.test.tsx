@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
 import { EditMode } from '../../src/app/EditMode';
 import { EditViewProvider } from '../../src/edit-view/EditViewContext';
+import { KeyboardsProvider } from '../../src/keyboards/KeyboardsContext';
 import { MidiInputProvider } from '../../src/midi/MidiInputContext';
 import { ModeProvider } from '../../src/mode/ModeContext';
 import { useMode } from '../../src/mode/useMode';
@@ -42,7 +43,9 @@ function renderWithProviders(ui: React.ReactElement) {
     >
       <MidiInputProvider>
         <ModeProvider>
-          <EditViewProvider>{ui}</EditViewProvider>
+          <KeyboardsProvider loader={async () => null} saver={async () => undefined}>
+            <EditViewProvider>{ui}</EditViewProvider>
+          </KeyboardsProvider>
         </ModeProvider>
       </MidiInputProvider>
     </PreferencesProvider>,
@@ -107,9 +110,9 @@ describe('EditMode', () => {
     expect(screen.queryByTestId('prefs-overlay')).toBeTruthy();
   });
 
-  it('renders the Setup placeholder view by default in the body', () => {
+  it('renders the Setup view by default in the body', () => {
     renderWithProviders(<EditMode />);
-    expect(screen.getByTestId('view-setup')).toBeTruthy();
+    expect(screen.getByTestId('setup-view')).toBeTruthy();
     expect(screen.queryByTestId('view-patches')).toBeNull();
     expect(screen.queryByTestId('view-cues')).toBeNull();
   });
@@ -139,8 +142,8 @@ describe('EditMode', () => {
     // Preferences gear and MIDI activity readout must remain (FR-010).
     expect(screen.getByRole('button', { name: 'Preferences' })).toBeTruthy();
     expect(screen.getByTestId('midi-activity')).toBeTruthy();
-    // Body still shows Setup placeholder by default.
-    expect(screen.getByTestId('view-setup')).toBeTruthy();
+    // Body still shows Setup view by default.
+    expect(screen.getByTestId('setup-view')).toBeTruthy();
   });
 
   it('dismissing the overlay via the close control closes it', () => {

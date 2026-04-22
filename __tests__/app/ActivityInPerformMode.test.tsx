@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { Pressable, View } from 'react-native';
 import { Shell } from '../../src/app/Shell';
+import { KeyboardsProvider } from '../../src/keyboards/KeyboardsContext';
 import { MidiInputProvider } from '../../src/midi/MidiInputContext';
 import { ModeProvider } from '../../src/mode/ModeContext';
 import { useMode } from '../../src/mode/useMode';
@@ -21,8 +22,10 @@ describe('MIDI activity visibility (FR-013 / SC-008)', () => {
       <PreferencesProvider loader={() => Promise.resolve({})} saver={() => Promise.resolve()}>
         <MidiInputProvider>
           <ModeProvider>
-            <Shell />
-            <EnterPerform />
+            <KeyboardsProvider loader={async () => null} saver={async () => undefined}>
+              <Shell />
+              <EnterPerform />
+            </KeyboardsProvider>
           </ModeProvider>
         </MidiInputProvider>
       </PreferencesProvider>,

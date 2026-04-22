@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { useEffect } from 'react';
 import { Pressable, View } from 'react-native';
 import { Shell } from '../../src/app/Shell';
+import { KeyboardsProvider } from '../../src/keyboards/KeyboardsContext';
 import { MidiInputProvider, useMidiInput } from '../../src/midi/MidiInputContext';
 import { ModeProvider } from '../../src/mode/ModeContext';
 import { useMode } from '../../src/mode/useMode';
@@ -49,10 +50,12 @@ describe('MIDI subsystem lifetime (FR-004)', () => {
       <PreferencesProvider loader={() => Promise.resolve({})} saver={() => Promise.resolve()}>
         <MidiInputProvider>
           <ModeProvider>
-            <Shell />
-            <Spy />
-            <EnterPerform />
-            <ExitPerform />
+            <KeyboardsProvider loader={async () => null} saver={async () => undefined}>
+              <Shell />
+              <Spy />
+              <EnterPerform />
+              <ExitPerform />
+            </KeyboardsProvider>
           </ModeProvider>
         </MidiInputProvider>
       </PreferencesProvider>,

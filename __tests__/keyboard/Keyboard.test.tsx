@@ -141,6 +141,58 @@ describe('Keyboard component', () => {
     const csharp4 = screen.getByTestId('keyboard-key-61');
     expect(flattenStyle(csharp4.props.style).backgroundColor).toBe(colors.keyboardBlackKey);
   });
+
+  describe('explicit width prop', () => {
+    it('renders at the given outer width and skips container measurement', () => {
+      render(<Keyboard low={48} high={72} width={702} />);
+      // No onLayout fire — the width prop drives sizing directly.
+      const root = screen.getByTestId('keyboard');
+      const rootStyle = flattenStyle(root.props.style);
+      expect(rootStyle.width).toBe(702);
+      // White-key width should equal (702 - 2) / 15 per our inner-width math.
+      const middleC = screen.getByTestId('keyboard-key-60');
+      const keyWidth = Number(flattenStyle(middleC.props.style).width);
+      expect(keyWidth).toBeCloseTo((702 - 2) / 15, 6);
+    });
+  });
+
+  describe('explicit height prop', () => {
+    it('renders at the given outer height and derives its width from key geometry', () => {
+      // 88-key piano at exactly 100 pt outer height:
+      // innerHeight = 98; whiteWidth = 98 / KEY_ASPECT (5.5) ≈ 17.818;
+      // inner width = whiteWidth * 52 white keys ≈ 926.55;
+      // outer width = inner width + 2 = ~928.55.
+      render(<Keyboard low={21} high={108} height={100} />);
+      const root = screen.getByTestId('keyboard');
+      const rootStyle = flattenStyle(root.props.style);
+      expect(rootStyle.height).toBeCloseTo(100, 6);
+      const expectedOuterWidth = (98 / 5.5) * 52 + 2;
+      expect(Number(rootStyle.width)).toBeCloseTo(expectedOuterWidth, 4);
+    });
+
+    it('height wins over width when both are provided', () => {
+      // height=100 for 25-key range (15 white keys).
+      // innerHeight = 98; whiteWidth = 98/5.5; inner width = 15 * whiteWidth.
+      // outer width = inner width + 2.
+      render(<Keyboard low={48} high={72} width={9999} height={100} />);
+      const root = screen.getByTestId('keyboard');
+      const rootStyle = flattenStyle(root.props.style);
+      expect(rootStyle.height).toBeCloseTo(100, 6);
+      const expectedOuterWidth = (98 / 5.5) * 15 + 2;
+      expect(Number(rootStyle.width)).toBeCloseTo(expectedOuterWidth, 4);
+      expect(Number(rootStyle.width)).not.toBeCloseTo(9999, 0);
+    });
+
+    it('two keyboards with different ranges and the same height prop share the same outer height', () => {
+      const first = render(<Keyboard low={21} high={108} height={120} />);
+      const outer88 = Number(flattenStyle(first.getByTestId('keyboard').props.style).height);
+      first.unmount();
+      const second = render(<Keyboard low={48} high={72} height={120} />);
+      const outer25 = Number(flattenStyle(second.getByTestId('keyboard').props.style).height);
+      expect(outer88).toBeCloseTo(120, 6);
+      expect(outer25).toBeCloseTo(120, 6);
+    });
+  });
 });
 
 function flattenStyle(style: unknown): Record<string, unknown> {

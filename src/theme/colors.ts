@@ -47,6 +47,15 @@ export const colors = {
   /** Pure black for perform-mode background (FR-006). Never substitute with surface. */
   performBlack: '#000000',
 
+  // --- feature 005: Setup tab (warning state) ---
+  //
+  // Amber/orange — non-blocking advisory. Used for disconnected-device icons
+  // and same-device-same-channel conflict banners.
+  //   warning on surface          ≈ 7.6:1  (AA UI; AAA for text)
+  //   warning on surfaceElevated  ≈ 6.6:1  (AA UI)
+  /** Advisory warning color (e.g., disconnected-device, channel conflict). */
+  warning: '#F59E0B',
+
   // --- feature 004: Keyboard display component ---
   //
   // Contrast notes (WCAG: 4.5:1 for normal text; 3:1 for UI components and

@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react-native';
 import { EditMode } from '../../src/app/EditMode';
 import { EditViewProvider } from '../../src/edit-view/EditViewContext';
+import { KeyboardsProvider } from '../../src/keyboards/KeyboardsContext';
 import { MidiInputProvider } from '../../src/midi/MidiInputContext';
 import { ModeProvider } from '../../src/mode/ModeContext';
 import { PreferencesProvider } from '../../src/prefs/PreferencesContext';
@@ -22,9 +23,11 @@ function renderEditMode() {
     <PreferencesProvider loader={() => Promise.resolve({})} saver={() => Promise.resolve()}>
       <MidiInputProvider>
         <ModeProvider>
-          <EditViewProvider>
-            <EditMode />
-          </EditViewProvider>
+          <KeyboardsProvider loader={async () => null} saver={async () => undefined}>
+            <EditViewProvider>
+              <EditMode />
+            </EditViewProvider>
+          </KeyboardsProvider>
         </ModeProvider>
       </MidiInputProvider>
     </PreferencesProvider>,
@@ -48,7 +51,7 @@ describe('SC-005: minimum supported phone width (320 pt, iPhone SE portrait)', (
     // Standalone Perform button is NOT present (covered by dropdown).
     expect(screen.queryByRole('button', { name: 'Perform' })).toBeNull();
 
-    // Edit-mode body renders default Setup placeholder.
-    expect(screen.getByTestId('view-setup')).toBeTruthy();
+    // Edit-mode body renders the Setup view (real implementation from feature 005).
+    expect(screen.getByTestId('setup-view')).toBeTruthy();
   });
 });

@@ -49,6 +49,18 @@ export interface KeyboardProps {
    * are silently ignored. Order and duplicates do not matter.
    */
   highlighted?: readonly number[];
+  /**
+   * Optional explicit outer width (pt). When provided, the component renders
+   * at this width instead of measuring its container. Ignored when `height`
+   * is also provided.
+   */
+  width?: number;
+  /**
+   * Optional explicit outer height (pt). When provided, the component renders
+   * at this height and derives its width from key geometry — takes precedence
+   * over both `width` and the measured container width.
+   */
+  height?: number;
   /** Optional testID forwarded to the root View (for testing only). */
   testID?: string;
   /** Optional override for the root View's a11y label. If omitted, the component generates one from props. */

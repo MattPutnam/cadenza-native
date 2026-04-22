@@ -8,6 +8,23 @@ export const BLACK_KEY_WIDTH_RATIO = 0.6;
 /** Black-key height as a fraction of the white-key (full) height. */
 export const BLACK_KEY_HEIGHT_RATIO = 0.62;
 
+/**
+ * Pure: given a range and a desired inner (key-area) height, return the
+ * matching inner width such that `computeKeyboardLayout(low, high, innerWidth)`
+ * produces a layout exactly `innerHeight` tall. Caller is responsible for
+ * passing a valid range; returns 0 when the range yields zero white keys.
+ */
+export function innerWidthForInnerHeight(
+  low: number,
+  high: number,
+  innerHeight: number,
+): number {
+  const whiteWidth = innerHeight / KEY_ASPECT;
+  const whites = whiteKeyCount(low, high);
+  if (whites <= 0) return 0;
+  return whiteWidth * whites;
+}
+
 function validate(
   low: number,
   high: number,

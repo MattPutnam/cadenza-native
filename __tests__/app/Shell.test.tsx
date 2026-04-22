@@ -1,6 +1,7 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { Pressable, View } from 'react-native';
 import { Shell } from '../../src/app/Shell';
+import { KeyboardsProvider } from '../../src/keyboards/KeyboardsContext';
 import { MidiInputProvider } from '../../src/midi/MidiInputContext';
 import { ModeProvider } from '../../src/mode/ModeContext';
 import { useMode } from '../../src/mode/useMode';
@@ -40,7 +41,11 @@ function renderWithAllProviders(ui: React.ReactElement) {
   return render(
     <PreferencesProvider loader={() => Promise.resolve({})} saver={() => Promise.resolve()}>
       <MidiInputProvider>
-        <ModeProvider>{ui}</ModeProvider>
+        <ModeProvider>
+          <KeyboardsProvider loader={async () => null} saver={async () => undefined}>
+            {ui}
+          </KeyboardsProvider>
+        </ModeProvider>
       </MidiInputProvider>
     </PreferencesProvider>,
   );
@@ -102,7 +107,7 @@ describe('Shell', () => {
     );
 
     // Initially in Edit mode, default sub-view is Setup.
-    expect(screen.getByTestId('view-setup')).toBeTruthy();
+    expect(screen.getByTestId('setup-view')).toBeTruthy();
 
     // Move to Patches via the real segmented-control UI.
     act(() => {
@@ -121,6 +126,6 @@ describe('Shell', () => {
 
     // Patches sub-view is preserved — not reset to Setup.
     expect(screen.getByTestId('view-patches')).toBeTruthy();
-    expect(screen.queryByTestId('view-setup')).toBeNull();
+    expect(screen.queryByTestId('setup-view')).toBeNull();
   });
 });

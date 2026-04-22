@@ -3,6 +3,7 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { Pressable, View } from 'react-native';
 import { Shell } from '../../src/app/Shell';
+import { KeyboardsProvider } from '../../src/keyboards/KeyboardsContext';
 import { MidiInputProvider } from '../../src/midi/MidiInputContext';
 import { ModeProvider } from '../../src/mode/ModeContext';
 import { useMode } from '../../src/mode/useMode';
@@ -21,7 +22,11 @@ function wrapTree(children: React.ReactNode) {
   return (
     <PreferencesProvider loader={() => Promise.resolve({})} saver={() => Promise.resolve()}>
       <MidiInputProvider>
-        <ModeProvider>{children}</ModeProvider>
+        <ModeProvider>
+          <KeyboardsProvider loader={async () => null} saver={async () => undefined}>
+            {children}
+          </KeyboardsProvider>
+        </ModeProvider>
       </MidiInputProvider>
     </PreferencesProvider>
   );

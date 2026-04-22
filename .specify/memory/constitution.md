@@ -1,33 +1,34 @@
 <!--
 Sync Impact Report
 ==================
-Version change: 1.0.0 → 1.1.0
-Bump rationale: MINOR — two new principles added (VI. Touch-First Performer UX,
-VII. Focused Accessibility) codifying the UX/UI rules in docs/design.md. No
-existing principles were removed or redefined, and no governance process
-changed. Added a brief "UX Design Reference" pointer under Platform &
-Technology Constraints so the design doc is discoverable from the constitution.
+Version change: 1.1.0 → 1.2.0
+Bump rationale: MINOR — new "Schema Versioning & Migration Readiness" bullet
+added to Platform & Technology Constraints. Codifies the pre-release posture
+on persisted data: scaffold the code for future migrations (required
+`version` field + a single migration entry point), but keep the migration
+body a no-op while the app is pre-release and data models are churning. No
+principles were removed or redefined; governance unchanged.
 
-Principles added:
-  - VI. Touch-First Performer UX
-  - VII. Focused Accessibility
-
+Principles added: none.
 Principles renamed / removed: none.
 
-Sections added: none at top level. Updated "Platform & Technology Constraints"
-with a pointer to docs/design.md and docs/glossary.md as the canonical
-references for UX and domain terminology.
+Sections added: none at top level. New bullet under "Platform & Technology
+Constraints" (Schema Versioning & Migration Readiness).
 
 Templates and docs reviewed for alignment:
   - .specify/templates/plan-template.md      ✅ compatible (Constitution Check placeholder remains open; no edits needed)
   - .specify/templates/spec-template.md      ✅ compatible (domain-agnostic)
-  - .specify/templates/tasks-template.md     ✅ compatible (Principles VI/VII apply to UI tasks but do not require new task categories)
-  - .specify/extensions.yml                  ✅ unchanged (still enforces Principle V)
-  - README.md                                ✅ no change required (product overview)
-  - docs/design.md                           ✅ source material — cited from constitution, no change
-  - docs/glossary.md                         ✅ reference — cited from constitution, no change
+  - .specify/templates/tasks-template.md     ✅ compatible (no new task categories)
+  - .specify/extensions.yml                  ✅ unchanged
+  - README.md                                ✅ no change required
+  - docs/design.md                           ✅ unaffected
+  - docs/glossary.md                         ✅ unaffected
 
-Deferred / TODO: none.
+Deferred / TODO: none. The new bullet is actionable as written; existing
+features (002 preferences, 005 setup keyboards) already carry `version: 1` in
+their stored blobs. A follow-up code pass to thread the single migration
+entry point through existing storage modules is recommended but not required
+by this amendment alone.
 -->
 
 # Cadenza Constitution
@@ -189,6 +190,20 @@ across surfaces no one uses.
 - **Data persistence:** Show data (songs, cues, patches, triggers, remaps,
   imported PDFs) MUST be stored locally on-device and survive app restarts and
   OS upgrades without data loss.
+- **Schema versioning & migration readiness:** Every persisted data blob
+  (AsyncStorage entries, local files, any future embedded database payload)
+  MUST include a `version` field at its root, and the load path MUST route
+  parsed data through a single named migration entry point whose signature
+  accepts any prior-version shape and returns either the current-version
+  shape or `null` (treated by callers as a miss → fall back to defaults).
+  The scaffolding — `version` field, entry point, and its call site — MUST
+  be in place so a future migration is a localized edit. During pre-release
+  development the migration function's body MUST remain a no-op: it accepts
+  only the current `version` and rejects everything else. Writing migration
+  logic for intermediate pre-release models is PROHIBITED — models are
+  changing fast and such code would have to be removed at release. Once the
+  app ships its first public release, every subsequent schema change MUST
+  add a migration path so no released version ever loses a user's data.
 - **UX design reference:** `docs/design.md` is the canonical source for UI
   design rules that extend Principles VI and VII (touch targets, tablet-vs-
   phone layout, dark mode, accessibility scope). `docs/glossary.md` is the
@@ -235,4 +250,4 @@ this document, or by amending this document.
   constitutional in nature belongs in `README.md`, `docs/`, or feature-specific
   docs under `/specs/…/`, not in this file.
 
-**Version**: 1.1.0 | **Ratified**: 2026-04-19 | **Last Amended**: 2026-04-19
+**Version**: 1.2.0 | **Ratified**: 2026-04-19 | **Last Amended**: 2026-04-22

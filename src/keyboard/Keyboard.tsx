@@ -1,25 +1,38 @@
 import { useMemo, useState } from 'react';
 import { StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
-import { computeKeyboardLayout } from './layout';
+import { computeKeyboardLayout, innerWidthForInnerHeight } from './layout';
 import { toNoteName } from './notes';
 import type { KeyboardLayoutError, KeyboardProps } from './types';
 import { colors } from '../theme/colors';
 
 const MAX_LABELED_HIGHLIGHTS = 5;
-const BORDER_WIDTH = 1;
+export const BORDER_WIDTH = 1;
 
 export function Keyboard({
   low,
   high,
   highlighted,
+  width: widthProp,
+  height: heightProp,
   testID = 'keyboard',
   accessibilityLabel,
 }: KeyboardProps) {
-  const [width, setWidth] = useState(0);
+  const [measuredWidth, setMeasuredWidth] = useState(0);
 
-  // The measured width is the outer (border-box) width. Subtract the border so
-  // keys are laid out inside the frame.
-  const innerWidth = Math.max(0, width - 2 * BORDER_WIDTH);
+  // Resolve the outer width in priority order:
+  //   1. `height` prop — derive width from key geometry (ignore any `width` prop).
+  //   2. `width` prop — use directly, skip measurement.
+  //   3. fall back to the container-measured width (onLayout).
+  // Subtract the border so `computeKeyboardLayout` operates on the inner box.
+  let innerWidth: number;
+  if (heightProp != null) {
+    const innerHeight = Math.max(0, heightProp - 2 * BORDER_WIDTH);
+    innerWidth = innerWidthForInnerHeight(low, high, innerHeight);
+  } else if (widthProp != null) {
+    innerWidth = Math.max(0, widthProp - 2 * BORDER_WIDTH);
+  } else {
+    innerWidth = Math.max(0, measuredWidth - 2 * BORDER_WIDTH);
+  }
 
   const layout = useMemo(
     () => computeKeyboardLayout(low, high, innerWidth, highlighted ?? []),
@@ -27,8 +40,11 @@ export function Keyboard({
   );
 
   const handleLayout = (e: LayoutChangeEvent) => {
+    // Only measure the container when we need the measurement — i.e., neither
+    // `width` nor `height` was passed.
+    if (heightProp != null || widthProp != null) return;
     const next = e.nativeEvent.layout.width;
-    if (next !== width) setWidth(next);
+    if (next !== measuredWidth) setMeasuredWidth(next);
   };
 
   const label = accessibilityLabel ?? generateAccessibilityLabel(low, high, highlighted ?? []);
@@ -57,12 +73,26 @@ export function Keyboard({
     );
   }
 
+  // Outer dimensions: height is always derived from the layout (plus border).
+  // Width is '100%' in fill-container mode; explicit pt in width/height modes.
+  const outerHeight = layout.height + 2 * BORDER_WIDTH;
+  const explicitWidth =
+    heightProp != null
+      ? innerWidth + 2 * BORDER_WIDTH
+      : widthProp != null
+        ? widthProp
+        : undefined;
+
   return (
     <View
       testID={testID}
       accessibilityRole="image"
       accessibilityLabel={label}
-      style={[styles.root, { height: layout.height + 2 * BORDER_WIDTH }]}
+      style={[
+        styles.root,
+        { height: outerHeight },
+        explicitWidth != null ? { width: explicitWidth } : null,
+      ]}
       onLayout={handleLayout}
     >
       {layout.keys.map((key) => {
