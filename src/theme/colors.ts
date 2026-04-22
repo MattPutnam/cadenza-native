@@ -47,6 +47,28 @@ export const colors = {
   /** Pure black for perform-mode background (FR-006). Never substitute with surface. */
   performBlack: '#000000',
 
+  // --- feature 004: Keyboard display component ---
+  //
+  // Contrast notes (WCAG: 4.5:1 for normal text; 3:1 for UI components and
+  // graphical objects):
+  //   keyboardWhiteKey on surface      ≈ 16.0:1  (AAA)
+  //   keyboardBlackKey on white key    ≈ 13.8:1  (AAA — the relevant adjacency)
+  //   keyboardHighlight on white key   ≈  4.1:1  (just under AA 4.5; passes AA 3:1 for UI/graphic)
+  //   keyboardHighlight on black key   ≈  3.3:1  (below AA 4.5; passes AA 3:1 for UI/graphic)
+  //
+  // A single blue cannot hit 4.5:1 against BOTH a very-light and a very-dark
+  // neutral — the mathematical midpoint is near 3.5:1. The current values
+  // prioritize palette coherence (`keyboardHighlight` === `accent`) and
+  // satisfy the 3:1 graphical-object standard, which is the applicable
+  // criterion for a state-changed UI element like a highlighted key.
+
+  /** Fill color for white keys. */
+  keyboardWhiteKey: '#E8E8EA',
+  /** Fill color for black keys. */
+  keyboardBlackKey: '#1A1A1F',
+  /** Fill color for highlighted keys. Reuses `accent` for palette coherence. */
+  keyboardHighlight: '#2563EB',
+
   // --- feature 003: Edit view switcher (segmented control + dropdown menu) ---
 
   /** Segmented control container/group background (unselected-segment grouping). */

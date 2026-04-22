@@ -12,7 +12,9 @@
     "ios:ipad": "xcrun simctl boot 'iPad Pro 11-inch (M5)' || true; open -a Simulator && expo start --ios",
     "web": "expo start --web",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "storybook": "EXPO_PUBLIC_STORYBOOK=true expo start",
+    "storybook:generate": "sb-rn-get-stories --config-path .storybook"
   },
   "jest": {
     "preset": "jest-expo",
@@ -41,6 +43,7 @@
     "react-native-web": "^0.21.0"
   },
   "devDependencies": {
+    "@storybook/react-native": "^7.6.20",
     "@testing-library/react-native": "^13.3.3",
     "@types/jest": "^29.5.14",
     "@types/react": "~19.1.0",
