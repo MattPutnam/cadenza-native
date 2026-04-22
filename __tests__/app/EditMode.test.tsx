@@ -1,11 +1,33 @@
 import { act, fireEvent, render, screen } from '@testing-library/react-native';
 import { Text } from 'react-native';
 import { EditMode } from '../../src/app/EditMode';
+import { EditViewProvider } from '../../src/edit-view/EditViewContext';
 import { MidiInputProvider } from '../../src/midi/MidiInputContext';
 import { ModeProvider } from '../../src/mode/ModeContext';
 import { useMode } from '../../src/mode/useMode';
 import { PreferencesProvider } from '../../src/prefs/PreferencesContext';
 import { colors } from '../../src/theme/colors';
+
+const mockUseWindowDimensions = jest.fn(() => ({
+  width: 400,
+  height: 800,
+  scale: 2,
+  fontScale: 1,
+}));
+
+jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
+  __esModule: true,
+  default: () => mockUseWindowDimensions(),
+}));
+
+function setWidth(width: number) {
+  mockUseWindowDimensions.mockReturnValue({
+    width,
+    height: 800,
+    scale: 2,
+    fontScale: 1,
+  });
+}
 
 function ModeProbe() {
   const { mode } = useMode();
@@ -19,14 +41,21 @@ function renderWithProviders(ui: React.ReactElement) {
       saver={() => Promise.resolve()}
     >
       <MidiInputProvider>
-        <ModeProvider>{ui}</ModeProvider>
+        <ModeProvider>
+          <EditViewProvider>{ui}</EditViewProvider>
+        </ModeProvider>
       </MidiInputProvider>
     </PreferencesProvider>,
   );
 }
 
 describe('EditMode', () => {
-  it('renders a header landmark at the top containing the "Perform" button', () => {
+  beforeEach(() => {
+    setWidth(400); // phone default for existing tests
+  });
+
+  it('renders a header landmark at the top containing the "Perform" button on tablet', () => {
+    setWidth(800);
     renderWithProviders(<EditMode />);
     const header = screen.getByTestId('edit-header');
     expect(header).toBeTruthy();
@@ -34,7 +63,8 @@ describe('EditMode', () => {
     expect(perform).toBeTruthy();
   });
 
-  it('activating the "Perform" button flips app mode to "perform"', () => {
+  it('activating the "Perform" button flips app mode to "perform" (tablet)', () => {
+    setWidth(800);
     renderWithProviders(
       <>
         <EditMode />
@@ -75,6 +105,42 @@ describe('EditMode', () => {
       fireEvent.press(screen.getByRole('button', { name: 'Preferences' }));
     });
     expect(screen.queryByTestId('prefs-overlay')).toBeTruthy();
+  });
+
+  it('renders the Setup placeholder view by default in the body', () => {
+    renderWithProviders(<EditMode />);
+    expect(screen.getByTestId('view-setup')).toBeTruthy();
+    expect(screen.queryByTestId('view-patches')).toBeNull();
+    expect(screen.queryByTestId('view-cues')).toBeNull();
+  });
+
+  it('on tablet (width >= 600), the segmented view switcher is rendered alongside the Perform button', () => {
+    setWidth(800);
+    renderWithProviders(<EditMode />);
+    expect(screen.getByTestId('edit-view-segmented')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Perform' })).toBeTruthy();
+    expect(screen.getByTestId('midi-activity')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Preferences' })).toBeTruthy();
+  });
+
+  it('on phone (width < 600), the segmented view switcher is NOT rendered', () => {
+    setWidth(400);
+    renderWithProviders(<EditMode />);
+    expect(screen.queryByTestId('edit-view-segmented')).toBeNull();
+  });
+
+  it('on phone (width < 600), the View dropdown replaces the standalone Perform button', () => {
+    setWidth(400);
+    renderWithProviders(<EditMode />);
+    // The View dropdown anchor IS present.
+    expect(screen.getByTestId('edit-view-dropdown-button')).toBeTruthy();
+    // The standalone Perform button is NOT present on phone.
+    expect(screen.queryByRole('button', { name: 'Perform' })).toBeNull();
+    // Preferences gear and MIDI activity readout must remain (FR-010).
+    expect(screen.getByRole('button', { name: 'Preferences' })).toBeTruthy();
+    expect(screen.getByTestId('midi-activity')).toBeTruthy();
+    // Body still shows Setup placeholder by default.
+    expect(screen.getByTestId('view-setup')).toBeTruthy();
   });
 
   it('dismissing the overlay via the close control closes it', () => {

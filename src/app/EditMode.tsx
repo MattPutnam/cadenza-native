@@ -2,8 +2,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useLayoutMode } from '../layout/useLayoutMode';
 import { useMode } from '../mode/useMode';
 import { colors } from '../theme/colors';
+import { EditViewBody } from './EditViewBody';
+import { EditViewHeaderControl } from './EditViewHeaderControl';
 import { MidiActivityDisplay } from './MidiActivityDisplay';
 import { PreferencesMenu } from './PreferencesMenu';
 
@@ -13,6 +16,7 @@ export function EditMode() {
   const [prefsFocused, setPrefsFocused] = useState(false);
   const [prefsOpen, setPrefsOpen] = useState(false);
   const insets = useSafeAreaInsets();
+  const layoutMode = useLayoutMode();
 
   return (
     <View style={styles.container}>
@@ -20,23 +24,26 @@ export function EditMode() {
         testID="edit-header"
         style={[styles.header, { paddingTop: insets.top + 8 }]}
       >
-        <Pressable
-          accessible
-          accessibilityRole="button"
-          accessibilityLabel="Perform"
-          focusable
-          onPress={() => setMode('perform')}
-          onFocus={() => setPerformFocused(true)}
-          onBlur={() => setPerformFocused(false)}
-          hitSlop={12}
-          style={({ pressed }) => [
-            styles.performButton,
-            pressed && styles.performButtonPressed,
-            performFocused && styles.performButtonFocused,
-          ]}
-        >
-          <Text style={styles.performLabel}>Perform</Text>
-        </Pressable>
+        {layoutMode === 'tablet' ? (
+          <Pressable
+            accessible
+            accessibilityRole="button"
+            accessibilityLabel="Perform"
+            focusable
+            onPress={() => setMode('perform')}
+            onFocus={() => setPerformFocused(true)}
+            onBlur={() => setPerformFocused(false)}
+            hitSlop={12}
+            style={({ pressed }) => [
+              styles.performButton,
+              pressed && styles.performButtonPressed,
+              performFocused && styles.performButtonFocused,
+            ]}
+          >
+            <Text style={styles.performLabel}>Perform</Text>
+          </Pressable>
+        ) : null}
+        <EditViewHeaderControl />
         <MidiActivityDisplay />
         <Pressable
           accessible
@@ -52,7 +59,7 @@ export function EditMode() {
           <Ionicons name="settings-outline" size={24} color={colors.textPrimary} />
         </Pressable>
       </View>
-      <View style={styles.body} />
+      <EditViewBody />
       <PreferencesMenu visible={prefsOpen} onClose={() => setPrefsOpen(false)} />
     </View>
   );
@@ -117,9 +124,5 @@ const styles = StyleSheet.create({
   prefsButtonFocused: {
     borderColor: colors.focusRing,
     borderWidth: 2,
-  },
-  body: {
-    flex: 1,
-    backgroundColor: colors.surface,
   },
 });

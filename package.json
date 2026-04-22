@@ -8,8 +8,8 @@
     "android:phone": "$ANDROID_HOME/emulator/emulator -avd Pixel_7 & $ANDROID_HOME/platform-tools/adb wait-for-device && expo start --android",
     "android:tablet": "$ANDROID_HOME/emulator/emulator -avd Pixel_Tablet & $ANDROID_HOME/platform-tools/adb wait-for-device && expo start --android",
     "ios": "expo run:ios",
-    "ios:iphone": "expo start --ios --device \"iPhone 15\"",
-    "ios:ipad": "expo start --ios --device \"iPad Pro 11-inch (M4)\"",
+    "ios:iphone": "xcrun simctl boot 'iPhone 17' || true; open -a Simulator && expo start --ios",
+    "ios:ipad": "xcrun simctl boot 'iPad Pro 11-inch (M5)' || true; open -a Simulator && expo start --ios",
     "web": "expo start --web",
     "test": "jest",
     "test:watch": "jest --watch"

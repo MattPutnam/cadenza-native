@@ -46,6 +46,23 @@ export const colors = {
   switchThumbOff: '#D4D4D8',
   /** Pure black for perform-mode background (FR-006). Never substitute with surface. */
   performBlack: '#000000',
+
+  // --- feature 003: Edit view switcher (segmented control + dropdown menu) ---
+
+  /** Segmented control container/group background (unselected-segment grouping). */
+  segmentedTrack: '#1F1F24',
+  /** Filled background of the currently-selected segment. */
+  segmentedSelected: '#2563EB',
+  /** Label color for unselected segments. textPrimary on segmentedTrack ≈ 12.0:1 (AAA). */
+  segmentedLabel: '#F5F5F7',
+  /** Label color for the selected segment. Contrast vs segmentedSelected ≈ 4.8:1 (AA). */
+  segmentedLabelSelected: '#FFFFFF',
+  /** Dropdown menu surface. Slightly brighter than surfaceElevated for pop. */
+  menuSurface: '#1C1C20',
+  /** Hairline divider between menu items. */
+  menuDivider: '#2A2A2F',
+  /** Pressed-state overlay for menu items (dark-mode press feedback). */
+  menuItemPressed: '#26262B',
 } as const;
 
 export type ColorToken = keyof typeof colors;

@@ -6,6 +6,18 @@ import { ModeProvider } from '../../src/mode/ModeContext';
 import { useMode } from '../../src/mode/useMode';
 import { PreferencesProvider } from '../../src/prefs/PreferencesContext';
 
+const mockUseWindowDimensions = jest.fn(() => ({
+  width: 800,
+  height: 1024,
+  scale: 2,
+  fontScale: 1,
+}));
+
+jest.mock('react-native/Libraries/Utilities/useWindowDimensions', () => ({
+  __esModule: true,
+  default: () => mockUseWindowDimensions(),
+}));
+
 function EnterPerform() {
   const { setMode } = useMode();
   return (
@@ -71,5 +83,44 @@ describe('Shell', () => {
     });
     expect(screen.queryByTestId('edit-header')).toBeTruthy();
     expect(screen.queryByTestId('perform-surface')).toBeNull();
+  });
+
+  it('preserves the Edit sub-view across Edit → Perform → Edit (FR-009, US3)', () => {
+    // Tablet width so we can tap the Patches segment directly.
+    mockUseWindowDimensions.mockReturnValue({
+      width: 800,
+      height: 1024,
+      scale: 2,
+      fontScale: 1,
+    });
+    renderWithAllProviders(
+      <>
+        <Shell />
+        <EnterPerform />
+        <ExitPerform />
+      </>,
+    );
+
+    // Initially in Edit mode, default sub-view is Setup.
+    expect(screen.getByTestId('view-setup')).toBeTruthy();
+
+    // Move to Patches via the real segmented-control UI.
+    act(() => {
+      fireEvent.press(screen.getByTestId('edit-view-segment-patches'));
+    });
+    expect(screen.getByTestId('view-patches')).toBeTruthy();
+
+    // Round-trip: Edit → Perform → Edit.
+    act(() => {
+      fireEvent.press(screen.getByTestId('harness-enter-perform'));
+    });
+    expect(screen.queryByTestId('edit-header')).toBeNull();
+    act(() => {
+      fireEvent.press(screen.getByTestId('harness-exit-perform'));
+    });
+
+    // Patches sub-view is preserved — not reset to Setup.
+    expect(screen.getByTestId('view-patches')).toBeTruthy();
+    expect(screen.queryByTestId('view-setup')).toBeNull();
   });
 });
