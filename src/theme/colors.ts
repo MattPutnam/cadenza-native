@@ -9,15 +9,19 @@
  *
  * - textPrimary on surface           ~14.6:1   (AAA)
  * - textPrimary on surfaceElevated   ~12.1:1   (AAA)
+ * - textPrimary on modalSurface      ~14.6:1   (AAA; modalSurface === surface tone)
  * - textSecondary on surface         ~7.4:1    (AAA)
  * - focusRing on surface             ~6.3:1    (AA for UI components)
  * - focusRing on performBlack        ~6.9:1    (AA for UI components)
+ * - switchThumbOn on switchTrackOn   ~4.8:1    (AA for UI components)
  */
 export const colors = {
   /** Base chrome background used by the edit shell below the header. */
   surface: '#0B0B0D',
   /** Slightly lighter elevation used by the header bar itself. */
   surfaceElevated: '#151518',
+  /** Full-bleed surface for the preferences modal overlay (opaque, not a scrim). */
+  modalSurface: '#0B0B0D',
   /** Hairline separator between the header and the body. */
   border: '#2A2A2F',
   /** Primary text and icon color (button labels, headings). */
@@ -32,6 +36,14 @@ export const colors = {
   accentPressed: '#1D4ED8',
   /** Text/icon color placed on top of accent fills. */
   onAccent: '#FFFFFF',
+  /** Switch track when the preference is ON (uses the same accent as primary buttons). */
+  switchTrackOn: '#2563EB',
+  /** Switch track when the preference is OFF (subdued neutral). */
+  switchTrackOff: '#3A3A3F',
+  /** Switch thumb when ON. */
+  switchThumbOn: '#FFFFFF',
+  /** Switch thumb when OFF. */
+  switchThumbOff: '#D4D4D8',
   /** Pure black for perform-mode background (FR-006). Never substitute with surface. */
   performBlack: '#000000',
 } as const;

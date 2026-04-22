@@ -4,10 +4,10 @@
   "main": "index.ts",
   "scripts": {
     "start": "expo start",
-    "android": "expo start --android",
+    "android": "expo run:android",
     "android:phone": "$ANDROID_HOME/emulator/emulator -avd Pixel_7 & $ANDROID_HOME/platform-tools/adb wait-for-device && expo start --android",
     "android:tablet": "$ANDROID_HOME/emulator/emulator -avd Pixel_Tablet & $ANDROID_HOME/platform-tools/adb wait-for-device && expo start --android",
-    "ios": "expo start --ios",
+    "ios": "expo run:ios",
     "ios:iphone": "expo start --ios --device \"iPhone 15\"",
     "ios:ipad": "expo start --ios --device \"iPad Pro 11-inch (M4)\"",
     "web": "expo start --web",
@@ -18,12 +18,21 @@
     "preset": "jest-expo",
     "testPathIgnorePatterns": [
       "/node_modules/",
-      "/.expo/"
-    ]
+      "/.expo/",
+      "/ios/",
+      "/android/",
+      "/__tests__/helpers/"
+    ],
+    "moduleNameMapper": {
+      "^@react-native-async-storage/async-storage$": "@react-native-async-storage/async-storage/jest/async-storage-mock",
+      "^.*/modules/expo-cadenza-midi$": "<rootDir>/__mocks__/modules/expo-cadenza-midi.js"
+    }
   },
   "dependencies": {
     "@expo/vector-icons": "^15.1.1",
+    "@react-native-async-storage/async-storage": "2.2.0",
     "expo": "~54.0.33",
+    "expo-dev-client": "~6.0.20",
     "expo-status-bar": "~3.0.9",
     "react": "19.1.0",
     "react-dom": "19.1.0",

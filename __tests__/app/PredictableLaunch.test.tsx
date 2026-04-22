@@ -3,8 +3,10 @@ import { readFileSync } from 'fs';
 import { join } from 'path';
 import { Pressable, View } from 'react-native';
 import { Shell } from '../../src/app/Shell';
+import { MidiInputProvider } from '../../src/midi/MidiInputContext';
 import { ModeProvider } from '../../src/mode/ModeContext';
 import { useMode } from '../../src/mode/useMode';
+import { PreferencesProvider } from '../../src/prefs/PreferencesContext';
 
 function EnterPerform() {
   const { setMode } = useMode();
@@ -15,14 +17,26 @@ function EnterPerform() {
   );
 }
 
+function wrapTree(children: React.ReactNode) {
+  return (
+    <PreferencesProvider loader={() => Promise.resolve({})} saver={() => Promise.resolve()}>
+      <MidiInputProvider>
+        <ModeProvider>{children}</ModeProvider>
+      </MidiInputProvider>
+    </PreferencesProvider>
+  );
+}
+
 describe('Predictable launch state (US2)', () => {
   it('cold-launches in edit mode regardless of prior session state', () => {
     // Drive a first "session" into perform mode.
     const first = render(
-      <ModeProvider>
-        <Shell />
-        <EnterPerform />
-      </ModeProvider>,
+      wrapTree(
+        <>
+          <Shell />
+          <EnterPerform />
+        </>,
+      ),
     );
     act(() => {
       fireEvent.press(screen.getByTestId('harness-enter-perform'));
@@ -33,11 +47,7 @@ describe('Predictable launch state (US2)', () => {
     first.unmount();
 
     // Mount a fresh provider + shell (simulating a cold launch).
-    render(
-      <ModeProvider>
-        <Shell />
-      </ModeProvider>,
-    );
+    render(wrapTree(<Shell />));
 
     // The new session must land in edit mode, not perform.
     expect(screen.queryByTestId('edit-header')).toBeTruthy();

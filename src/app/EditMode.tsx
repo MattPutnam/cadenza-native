@@ -1,12 +1,17 @@
+import { Ionicons } from '@expo/vector-icons';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useMode } from '../mode/useMode';
 import { colors } from '../theme/colors';
+import { MidiActivityDisplay } from './MidiActivityDisplay';
+import { PreferencesMenu } from './PreferencesMenu';
 
 export function EditMode() {
   const { setMode } = useMode();
   const [performFocused, setPerformFocused] = useState(false);
+  const [prefsFocused, setPrefsFocused] = useState(false);
+  const [prefsOpen, setPrefsOpen] = useState(false);
   const insets = useSafeAreaInsets();
 
   return (
@@ -32,8 +37,23 @@ export function EditMode() {
         >
           <Text style={styles.performLabel}>Perform</Text>
         </Pressable>
+        <MidiActivityDisplay />
+        <Pressable
+          accessible
+          accessibilityRole="button"
+          accessibilityLabel="Preferences"
+          focusable
+          onPress={() => setPrefsOpen(true)}
+          onFocus={() => setPrefsFocused(true)}
+          onBlur={() => setPrefsFocused(false)}
+          hitSlop={12}
+          style={[styles.prefsButton, prefsFocused && styles.prefsButtonFocused]}
+        >
+          <Ionicons name="settings-outline" size={24} color={colors.textPrimary} />
+        </Pressable>
       </View>
       <View style={styles.body} />
+      <PreferencesMenu visible={prefsOpen} onClose={() => setPrefsOpen(false)} />
     </View>
   );
 }
@@ -53,7 +73,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
   },
   performButton: {
     minWidth: 104,
@@ -82,6 +102,21 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     letterSpacing: 0.3,
+  },
+  prefsButton: {
+    // Kept similar in width to the Perform button so MidiActivityDisplay stays
+    // visually centered between them.
+    minWidth: 104,
+    minHeight: 44,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 10,
+    alignItems: 'flex-end',
+    justifyContent: 'center',
+  },
+  prefsButtonFocused: {
+    borderColor: colors.focusRing,
+    borderWidth: 2,
   },
   body: {
     flex: 1,
